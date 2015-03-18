@@ -32,12 +32,11 @@ end
 if offline>0
     disp('Offline Mode');
     %dirname = uigetdir('Z:\astra\OpenEphys sample data\', 'Select Data Directory');
-    %dirname = uigetdir('C:\Users\hlab\Documents\Data\', 'Select Data Directory');
-    
-    %%%%%%%%%%%%%%%%%%%%%%% RJM EDIT 
-    %dirname = uigetdir('C:\Users\Ryan\Documents\Data\', 'Select Data Directory');
-    dirname = 'C:\Users\Ryan\Documents\Data\SampleData\2015-03-11_16-44-57';     
-    %%%%%%%%%%%%%%%% RJM EDIT 
+    dirname = uigetdir('C:\Users\hlab\Documents\Data\', 'Select Data Directory');
+
+    %%%%%%%%%%%%%%%%%%%%%%% RJM FOR DEBUG ONLY: 
+	%dirname = 'C:\Users\Ryan\Documents\Data\SampleData\2015-03-11_16-44-57';     
+
     cd(dirname);
     
 else
@@ -125,17 +124,19 @@ end
 % end
 %     
 
-%trial_info_dir = 'C:\Users\hlab\Documents\Data\exptStimData\';
-trial_info_dir = 'C:\Users\Ryan\Documents\Data\SampleData'; 
+trial_info_dir = 'C:\Users\hlab\Documents\Data\exptStimData\';
+%trial_info_dir = 'C:\Users\Ryan\Documents\Data\SampleData'; 
 
 if offline > 0 %added to help with offline debugging on Onyx
     %load(fullfile(dirname,'ZMQMessage'))
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%% RJM EDIT
-% 	[zmqfilename, zmq_dir] = uigetfile(trial_info_dir);
-%     addpath(genpath(zmq_dir)); 
-    zmqfilename = 'C:\Users\Ryan\Documents\Data\SampleData\exptStimData\exp15-03-11-1644stim.mat'; 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RJM EDIT
+
+ 	[zmqfilename, zmq_dir] = uigetfile(trial_info_dir);
+    addpath(genpath(zmq_dir)); 
+	
+	% RJM FOR DEBUG ONLY
+   % zmqfilename = 'C:\Users\Ryan\Documents\Data\SampleData\exptStimData\exp15-03-11-1644stim.mat'; 
+
 	
 	load(zmqfilename)
 else

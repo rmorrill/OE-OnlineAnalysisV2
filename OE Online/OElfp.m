@@ -78,14 +78,14 @@ ttlfile=strcat(timingfile{1,1}{1,1},'_ADC2.continuous');
 for x=1:numchans
     eval(['fid{' num2str(x) '}=fopen(fileList{x});']);
     if fid{x} == -1
-        error(sprintf('Could not open continuous file %s in directory %s', spikefile{x}, dirname)); 
+        errordlg(sprintf('Could not open continuous file %s in directory %s', spikefile{x}, dirname)); 
 	return
     end
 end
     
     eid=fopen(ttlfile);
 if eid == -1
-	error('Could not open ADC file %s in directory %s', ttlfile, dirname); 
+	errordlg(sprintf('Could not open ADC trigger channel %s in directory %s, is ADC channel recording activated?', ttlfile, dirname), 'ADC not found'); 
 	return
 end
 

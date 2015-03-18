@@ -68,7 +68,7 @@ while ~KEY_IS_PRESSED
         %z_var_list = {'Firing rate', 'Variance'}; % Removed variance because it's not an active option yet.
         fighand = figure;
         set(fighand, 'Position', [800 100 150 600], 'menubar', 'none')
-        x_hand = uicontrol(fighand, 'Style', 'listbox', 'Position', [10 480 130 80], 'FontSize', 12, 'String', [var_list std_var_list]);
+        x_hand = uicontrol(fighand, 'Style', 'listbox', 'Position', [10 480 130 80], 'FontSize', 12, 'String', [var_list std_var_list], 'Value', 2);
         uicontrol('Style', 'text', 'String', 'X axis', 'Position', [5 563 100 20]);
         %y_hand = uicontrol(fighand, 'Style', 'listbox', 'Position', [10 265 130 160], 'FontSize', 12, 'String', [var_list std_var_list]);
         y_hand = uicontrol(fighand, 'Style', 'listbox', 'Position', [10 365 130 80], 'FontSize', 12, 'String', [var_list]);
@@ -292,8 +292,11 @@ while ~KEY_IS_PRESSED
     % spike count
     if all(cellfun(@isempty,spikes_per_trial)) %if there are absolutely no spikes at all
         disp('No spikes in any bin. If actively acquiring, try restarting in a few moments')
-        break
-    end
+		user_resp = questdlg('No spikes found on this channel, would you like to shutdown loop?',  'Shutdown', 'Yes', 'No', 'No');
+		if strcmp(user_resp, 'Yes')
+			break
+		end
+	end
     
     
     %eval(['spikes_per_trial{' num2str(x) '}= vertcat(spikes_per_trial{' num2str(x) '}, ctranspose(OEread(fid{x},ttlinfo)));']);
