@@ -1,0 +1,1 @@
+Requirements: ZMQ bindings, avaliable from source on github
