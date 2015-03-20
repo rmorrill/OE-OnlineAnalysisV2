@@ -524,7 +524,7 @@ while ~KEY_IS_PRESSED
                 for x=1:logical_vars
                     input_spikes=spike_data_padded;
                     input_spikes(find(K~=x))=0; % RJM confused what does this do?
-                    HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), shiftedtimewindow)
+                    HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), timewindow)
                     
                 end
             else
