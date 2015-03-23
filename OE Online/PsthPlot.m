@@ -122,6 +122,17 @@ for x=1:size(B,1)
 
 end
 
+a2= axes('position',  [0 0.8, 0.09 0.1]); % notes axis 
+set(a2, 'XTick', []); 
+set(a2, 'YTick', []); 
+text(0.05, 0.85, sprintf('Trials: %d',  size(norm_spikes_per_trial, 1))); 
+text(0.05, 0.55, sprintf('Trial tot: %d', length(xy))); 
+% text(0.05, 0.7, sprintf('Stim combs: %d', nr_uniq_x*nr_uniq_y)); 
+% text(0.05, 0.6, sprintf('Aud stim: ')); 
+% text(0.05, 0.5, sprintf('Dur: ')); 
+% text(0.05, 0.4, sprintf('Vis stim: ')); 
+% text(0.05, 0.3, sprintf('ISI : ')); 
+
 	filepath= cd;
 	print(gcf,'-dpng',fullfile(filepath, get(gcf,'Name')));
 

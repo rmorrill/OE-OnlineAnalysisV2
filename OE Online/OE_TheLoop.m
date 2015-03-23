@@ -1,5 +1,8 @@
 function OE_TheLoop(chanList, fid, eid, numchans, stim_vals, var_list, offline, spikefiles)
-% Gloriously updated by Astra S. Bryant on Feb 9, 2015
+
+% Astra Bryant/Ryan Morrill 
+
+% Last updated by RJM 03/23/15 
 
 %Fetch key variables
 %fid = evalin('base','fid');
@@ -351,26 +354,36 @@ while ~KEY_IS_PRESSED
     
     %Automatically detecting presence of logically varied stimuli (e.g.
     %visual stimulus on/off or opto stim on/off
+    
     if  ~isempty(strmatch('vis_stim',var_list,'exact')) %are visual stimuli being varied on/off: this in going to break hard if we're parametrically varying light stimuli....
         v_inx = strmatch('vis_stim',var_list,'exact');
         v_prms = stim_vals{v_inx};
+       % v_prms = v_prms(1:trialcount); 
         v_sel='vis_stim';
     else
-        v_prms = [];
+        v_prms = zeros(1,totaltrialno);
         v_sel='';
     end
     
     if ~isempty(strmatch('light',var_list,'exact')) %are opto stimuli being varied on/off
         o_inx = strmatch('light',var_list,'exact');
         o_prms = stim_vals{o_inx};
+       % o_prms = o_prms(1:trialcount); 
         o_sel='light';
     else
-        o_prms =  [];
+        o_prms =  zeros(1,totaltrialno);
         o_sel='';
     end
     
     vo = [v_prms' o_prms'];
     
+    if ~isempty(vo) && ~all(all(vo == 0))
+        multiplot = 1; 
+    else
+        multiplot = 0; 
+    end
+    
+    %vo_sel = {o_sel v_sel}; 
     
     scrnsize=get(0,'screensize');
     
@@ -396,11 +409,11 @@ while ~KEY_IS_PRESSED
             %                 end
             %             end
             
-            if ~isempty(vo)
+            if multiplot
                 [B,~,J] = unique(vo, 'rows'); % J contains indices that group by stimulus paramaters
                 disp(sprintf('%d logically varied conditions automatically detected',size(B,1)));
                 logical_vars=size(B,1);
-                ind=J(1:size(spikes_per_trial,2));
+                ind=J(1:size(spikes_per_trial,1));
                 for x=1:size(B, 1)
                     sort_spt{x,:}= spikes_per_trial(find(ind==x)); % sort_spt = sorted spikes per trial
                     sort_xy{x,:}=yx(find(J==x))
@@ -412,10 +425,8 @@ while ~KEY_IS_PRESSED
             
             if ~exist('psth_fig_handle')
                 %If it doesn't already exist, then create it - otherwise use
-                %the old one
-                
-                
-                if ~isempty(vo)
+                %the old one  
+                if multiplot
                     for y=1:logical_vars
                         if logical_vars==2;
                             psth_fig_handle(y)=figure('Position',[(50+((round(scrnsize(3)*.45)+50)*(y-1))), (scrnsize(4)-round(scrnsize(4)*.45)-100), round(scrnsize(3)*.45), round(scrnsize(4)*.45)]);
@@ -444,14 +455,14 @@ while ~KEY_IS_PRESSED
                         if nr_uniq_y<=4
                             eval(['subhandle{' num2str(y) ',' num2str(x) '}= subplot(nr_uniq_y, 1,x);']);
                         else
-                            eval(['subhandle{' num2str(y) ',' num2str(x) '}= subplot(4, round(nr_uniq_y/4),x);']);
+                            eval(['subhandle{' num2str(y) ',' num2str(x) '}= subplot(4, ceil(nr_uniq_y/4),x);']);
                         end
                     end
                 end
             end
             
             
-            if ~isempty(vo)
+            if multiplot
                 for y=1:logical_vars
                     PsthPlot(duration, timewindow_padding, channel_plot, sort_spt{y}, psth_fig_handle(y), subhandle(y,:), sort_xy{y}, x_sel, y_sel, v_sel, o_sel, B(y,:))
                     
@@ -464,7 +475,7 @@ while ~KEY_IS_PRESSED
             if ~exist('heat_fig_handle')
                 %If it doesn't already exist, then create it - otherwise use
                 %the old one
-                if ~isempty(vo)
+                if multiplot
                     
                     [A,~,K]=unique(vo,'rows');
                     disp(sprintf('%d logically varied conditions automatically detected',size(A,1)));
@@ -519,19 +530,21 @@ while ~KEY_IS_PRESSED
             spike_data_padded=nan(totaltrialno,1);
             spike_data_padded(1:trialcount)=spike_data;
             
-            if ~isempty(vo)
-                
+            if multiplot
                 for x=1:logical_vars
                     input_spikes=spike_data_padded;
-                    input_spikes(find(K~=x))=0; % RJM confused what does this do?
-                    HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), timewindow)
+                   % input_spikes(find(K~=x))=0; % RJM this means we're
+                   % feeding zeros in, which will be confused for a data 
+                   cond_len = length(find(K==x)); 
+                   input_spikes(find(K~=x)) = NaN; % RJM instead use NaNs
+                   HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), timewindow, cond_len)
                     
                 end
             else
                 input_spikes=spike_data_padded;
                 % assignin('base', 'input_spikes', input_spikes);
                 %HeatPlot(input_spikes,xy, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], shiftedtimewindow)
-                HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], timewindow)
+                HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], timewindow, length(input_spikes))
             end
         end
     end

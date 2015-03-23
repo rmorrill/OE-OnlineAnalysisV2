@@ -33,6 +33,7 @@ if offline>0
     disp('Offline Mode');
     %dirname = uigetdir('Z:\astra\OpenEphys sample data\', 'Select Data Directory');
     dirname = uigetdir('C:\Users\hlab\Documents\Data\', 'Select Data Directory');
+    fprintf('\nUsing data in %s\n', dirname); 
 
     %%%%%%%%%%%%%%%%%%%%%%% RJM FOR DEBUG ONLY: 
 	%dirname = 'C:\Users\Ryan\Documents\Data\SampleData\2015-03-11_16-44-57';     
@@ -122,18 +123,34 @@ end
 % %var_list = evalin('base','var_list');
 % save(fullfile(dirname,'ZMQMessage'),'var_list', 'stim_vals');
 % end
-%     
+%
 
 trial_info_dir = 'C:\Users\hlab\Documents\Data\exptStimData\';
-%trial_info_dir = 'C:\Users\Ryan\Documents\Data\SampleData'; 
+%trial_info_dir = 'C:\Users\Ryan\Documents\Data\SampleData';
 
 if offline > 0 %added to help with offline debugging on Onyx
     %load(fullfile(dirname,'ZMQMessage'))
+    cd(dirname);
+    cd('../');
+    dirCont = dir;
     
-
- 	[zmqfilename, zmq_dir] = uigetfile(trial_info_dir);
-    addpath(genpath(zmq_dir)); 
-	
+    uifindzmqfile = 1;
+    if any(strcmp('exptStimData', {dirCont([dirCont.isdir]).name}))
+        cd('exptStimData');
+        date_str = char(regexp(dirname, '\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}', 'match'));
+        zmqfilename = ['exp' date_str(3:10) '-' date_str(12:13) date_str(15:16) 'stim.mat'];
+        if exist(zmqfilename, 'file')>0
+            uifindzmqfile = 0;
+            fprintf('\nFound trial sequence file %s, will use this for trial indexing\n', zmqfilename); 
+        else
+            fprintf('\nNo trial sequence file located, will ask user to find it\n'); 
+    end
+    
+    if uifindzmqfile
+        [zmqfilename, zmq_dir] = uigetfile(trial_info_dir);
+        addpath(genpath(zmq_dir));
+    end
+    
 	% RJM FOR DEBUG ONLY
    % zmqfilename = 'C:\Users\Ryan\Documents\Data\SampleData\exptStimData\exp15-03-11-1644stim.mat'; 
 

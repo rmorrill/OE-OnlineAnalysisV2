@@ -1,4 +1,4 @@
-function HeatPlot (spike_data, yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,vo_cond, timewindow)
+function HeatPlot (spike_data, yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,vo_cond, timewindow, cond_len)
 % Heat plot. Feb 5, 2015, Astra S. Bryant/Ryan Morrill
 %
 % spike_data_padded=zeros(totaltrialno,1);
@@ -28,6 +28,10 @@ data_avg = accumarray(J, spike_data', [size(B,1) 1], @nanmean);
 % sort by y value for plotting?
 data_rs = reshape(data_avg, nr_uniq_x, nr_uniq_y)';
 
+if strcmp(y_sel, 'audio_atten')
+    data_rs = flipud(data_rs);
+end
+
 %% Plotting
 
 % % 	if ~exist('fig_handle')
@@ -46,51 +50,87 @@ else
     opto_stat='Opto Light On';
 end
 
-
-
 figure(heat_fig_handle)
 set(heat_fig_handle, 'Name',sprintf('Channel %d, %s, %s',channel_plot,vis_stat, opto_stat),'NumberTitle','off');
-hold off
+
 %figure
 % RJM MOD
 % maxval = max(data_rs(:));
 % data_rs(isnan(data_rs)) = maxval + maxval/20; % make nans a bit higher than the highest val 
-data_rs(isnan(data_rs)) = -0.1; 
-clims=[-.1 max(max(data_rs))];
-% clims=[min(min(data_rs)) max(max(data_rs))];
 
-%imagesc(data_rs, clims) % RJM 
-imagesc(data_rs); 
+
+if any(any(isnan(data_rs)))
+    data_rs(isnan(data_rs)) = -0.1;
+    clims=[-.1 max(max(data_rs))];
+else
+    clims=[min(min(data_rs)) max(max(data_rs))];
+end
+
+
+% a2= axes('position', [0, 0.65, 0.13 0.35]); % notes axis 
+a = axes('position', [0.18 0.1 0.81 0.82]);
+imagesc(data_rs, clims) % RJM 
+%imagesc(data_rs); 
 %END RJM MOD
 %imagesc(data_rs,[min(data_avg_sort(find(data_avg_sort>0)))-2,max(data_avg_sort(find(data_avg_sort>0)))]);
 hold on
 axis xy
 
-
 % %%% RJM EDIT 
-% cmap=colormap(jet(255));
-% %cmap = flipud([254:-1:0; zeros(1,255); zeros(1,255)]'/254);
-% % colormap(flipud([255:-1:0; zeros(1,256); zeros(1,256)]'/255));
-% %cmap=colormap();
-% 
-% cmap=[.7 .7 .7;cmap]; % makes lowest val light gray
-% colormap(cmap);
-% colorbar();
+cmap=colormap(jet(255));
+%cmap = flipud([254:-1:0; zeros(1,255); zeros(1,255)]'/254);
+% colormap(flipud([255:-1:0; zeros(1,256); zeros(1,256)]'/255));
+%cmap=colormap();
+
+if any(any(isnan(data_rs)))
+    cmap=[.7 .7 .7;cmap]; % makes lowest val light gray
+    colormap(cmap);
+end
+colorbar();
 % %%%%%% RJM EDIT
 
-h=ylabel(y_sel, 'FontSize', 8);
+h=ylabel(y_sel, 'FontSize', 12);
 set(h, 'interpreter','none') %removes tex interpretation rules
-h=xlabel(x_sel, 'FontSize', 8);
-set(h, 'interpreter','none') %removes tex interpretation rules
+% h=xlabel(x_sel, 'FontSize', 12);
+% set(h, 'interpreter','none') %removes tex interpretation rules
 
 set(gca, 'YTick', [1:nr_uniq_y]);
-set(gca, 'YTickLabel', uniq_y);
+if strcmp(y_sel, 'audio_atten')
+    set(gca, 'YTickLabel', fliplr(uniq_y));
+else
+    set(gca, 'YTickLabel', uniq_y);
+end
 set(gca, 'XTick', [1:nr_uniq_x]);
-set(gca, 'XTickLabel', uniq_x);
-set(gca,'fontsize',8);
-%title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)-.15), num2str(timewindow(2)-.15), vis_stat, opto_stat),'FontSize',10);
-title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)), num2str(timewindow(2)), vis_stat, opto_stat),'FontSize',10);
+if strcmp(x_sel, 'audio_freq')
+    h=xlabel([x_sel  ' (kHz)'], 'FontSize', 12);
+    set(h, 'interpreter','none') %removes tex interpretation rules
+     for i = 1:length(uniq_x); x_lab{i} = sprintf('%0.1f', uniq_x(i)/1e3); end
+    set(gca, 'XTickLabel', x_lab);
+    set(gca,'fontsize',10);
+else
+    h=xlabel(x_sel, 'FontSize', 12);
+    set(gca, 'XTickLabel', uniq_x); 
+    set(gca, 'FontSize', 12); 
+end
+   set(h, 'interpreter','none') %removes tex interpretation rules
 
+%title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)-.15), num2str(timewindow(2)-.15), vis_stat, opto_stat),'FontSize',10);
+title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)), num2str(timewindow(2)), vis_stat, opto_stat),'FontSize',12);
+
+a2= axes('position', [0, 0.65, 0.13 0.35]); % notes axis 
+set(a2, 'XTick', []); 
+set(a2, 'YTick', []); 
+text(0.05, 0.9, sprintf('Trial count: %d',  sum(~isnan(spike_data)))); 
+text(0.05, 0.8, sprintf('Trial total: %d', cond_len));  
+text(0.05, 0.7, sprintf('Stim combs: %d', nr_uniq_x*nr_uniq_y)); 
+text(0.05, 0.6, sprintf('Aud stim: ')); 
+text(0.05, 0.5, sprintf('Dur: ')); 
+text(0.05, 0.4, sprintf('Vis stim: ')); 
+text(0.05, 0.3, sprintf('ISI : ')); 
+%text(0.05, 0.3, sprintf('Light :')); 
+% 
+% text(0.05, 0.6, opto_stat);
+% text(0.05, 0.5, vis_stat); 
 
 filepath= cd;
 print(gcf,'-dpng',fullfile(filepath, get(gcf,'Name')));
