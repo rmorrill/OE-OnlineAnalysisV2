@@ -1,4 +1,4 @@
-function PsthPlot(duration, timewindow_padding, channel_plot, norm_spikes_per_trial, psth_fig_handle, subhandle, xy, x_sel, y_sel,  v_sel, o_sel, vo_cond)
+function PsthPlot(duration, timewindow_padding, channel_plot, norm_spikes_per_trial, psth_fig_handle, subhandle, xy, x_sel, y_sel,  v_sel, o_sel, vo_cond, sorted)
 	
 % Histogram plot. Feb 9, 2015, Astra S. Bryant
 %REALLY IMPORTANT: if this program is run in R2014b, histc may not work.
@@ -71,21 +71,28 @@ if ~isempty(o_sel)
 else
 	opto_stat='';
 end
+
+if sorted 
+    sorted_stat = 'Sorted'; 
+else
+    sorted_stat = 'Unsorted'; 
+end
+
 figure(psth_fig_handle)
 
 %title/figure naming
 if ~isempty(vis_stat) & ~isempty(opto_stat)
 	set(psth_fig_handle, 'Name',sprintf('Channel %d PSTH, Vis Stim and Opto Light On',channel_plot),'NumberTitle','off');
-	suptitle([sprintf('Channel %d PSTH, %s, %s',channel_plot,vis_stat, opto_stat)]);
+	suptitle([sprintf('Channel %d PSTH, %s, %s, %s',channel_plot,vis_stat, opto_stat, sorted_stat)]);
 elseif ~isempty(vis_stat)
 	set(psth_fig_handle, 'Name',sprintf('Channel %d PSTH, Vis Stim On',channel_plot),'NumberTitle','off');
-	suptitle([sprintf('Channel %d PSTH, %s',channel_plot,vis_stat)]);
+	suptitle([sprintf('Channel %d PSTH, %s, %s',channel_plot,vis_stat, sorted_stat)]);
 elseif ~isempty(opto_stat)
 	set(psth_fig_handle, 'Name',sprintf('Channel %d PSTH, Opto Light On',channel_plot),'NumberTitle','off');
-	suptitle([sprintf('Channel %d PSTH, %s',channel_plot,opto_stat)]);	
+	suptitle([sprintf('Channel %d PSTH, %s, %s',channel_plot,opto_stat,sorted_stat)]);	
 else
 	set(psth_fig_handle, 'Name',sprintf('Channel %d PSTH',channel_plot),'NumberTitle','off');
-	suptitle([sprintf('Channel %d PSTH',channel_plot)]);
+	suptitle([sprintf('Channel %d PSTH, %s',channel_plot, sorted_stat)]);
 end
  
  

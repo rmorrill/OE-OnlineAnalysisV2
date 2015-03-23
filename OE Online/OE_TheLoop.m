@@ -464,11 +464,11 @@ while ~KEY_IS_PRESSED
             
             if multiplot
                 for y=1:logical_vars
-                    PsthPlot(duration, timewindow_padding, channel_plot, sort_spt{y}, psth_fig_handle(y), subhandle(y,:), sort_xy{y}, x_sel, y_sel, v_sel, o_sel, B(y,:))
+                    PsthPlot(duration, timewindow_padding, channel_plot, sort_spt{y}, psth_fig_handle(y), subhandle(y,:), sort_xy{y}, x_sel, y_sel, v_sel, o_sel, B(y,:), sortedFlag)
                     
                 end
             else
-                PsthPlot(duration, timewindow_padding, channel_plot, sort_spt, psth_fig_handle, subhandle, yx, x_sel, y_sel, v_sel, o_sel, [0 0])
+                PsthPlot(duration, timewindow_padding, channel_plot, sort_spt, psth_fig_handle, subhandle, yx, x_sel, y_sel, v_sel, o_sel, [0 0], sortedFlag)
                 
             end
         else % PLOT A HEATMAP TYPE FIGURE
@@ -537,14 +537,14 @@ while ~KEY_IS_PRESSED
                    % feeding zeros in, which will be confused for a data 
                    cond_len = length(find(K==x)); 
                    input_spikes(find(K~=x)) = NaN; % RJM instead use NaNs
-                   HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), timewindow, cond_len)
+                   HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle(x),A(x,:), timewindow, cond_len, sortedFlag)
                     
                 end
             else
                 input_spikes=spike_data_padded;
                 % assignin('base', 'input_spikes', input_spikes);
                 %HeatPlot(input_spikes,xy, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], shiftedtimewindow)
-                HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], timewindow, length(input_spikes))
+                HeatPlot(input_spikes,yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,[0 0], timewindow, length(input_spikes), sortedFlag)
             end
         end
     end

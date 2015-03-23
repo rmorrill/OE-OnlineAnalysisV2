@@ -1,4 +1,4 @@
-function HeatPlot (spike_data, yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,vo_cond, timewindow, cond_len)
+function HeatPlot (spike_data, yx, y_idx, x_idx, nr_uniq_x, nr_uniq_y, uniq_x, uniq_y, y_sel, x_sel, channel_plot, heat_fig_handle,vo_cond, timewindow, cond_len, sorted)
 % Heat plot. Feb 5, 2015, Astra S. Bryant/Ryan Morrill
 %
 % spike_data_padded=zeros(totaltrialno,1);
@@ -48,6 +48,12 @@ if vo_cond(2)<1
     opto_stat='No Opto Light';
 else
     opto_stat='Opto Light On';
+end
+
+if sorted 
+    sorted_stat = 'Sorted'; 
+else
+    sorted_stat = 'Unsorted'; 
 end
 
 figure(heat_fig_handle)
@@ -115,7 +121,7 @@ end
    set(h, 'interpreter','none') %removes tex interpretation rules
 
 %title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)-.15), num2str(timewindow(2)-.15), vis_stat, opto_stat),'FontSize',10);
-title(sprintf('Channel %d, Time: %s-%s s, %s, %s',channel_plot,num2str(timewindow(1)), num2str(timewindow(2)), vis_stat, opto_stat),'FontSize',12);
+title(sprintf('Channel %d, Time: %s-%s s, %s, %s, %s',channel_plot,num2str(timewindow(1)), num2str(timewindow(2)), vis_stat, opto_stat, sorted_stat),'FontSize',12);
 
 a2= axes('position', [0, 0.65, 0.13 0.35]); % notes axis 
 set(a2, 'XTick', []); 
