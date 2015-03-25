@@ -145,7 +145,7 @@ if offline > 0 %added to help with offline debugging on Onyx
         else
             fprintf('\nNo trial sequence file located, will ask user to find it\n'); 
     end
-    
+	end
     if uifindzmqfile
         [zmqfilename, zmq_dir] = uigetfile(trial_info_dir);
         addpath(genpath(zmq_dir));
@@ -187,4 +187,4 @@ end
 
 OE_TheLoop(chanList, fid, eid, numchans, stim_vals, var_list, offline, spikefiles)
 
-end
+
