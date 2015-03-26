@@ -376,9 +376,9 @@ while ~KEY_IS_PRESSED
     end
     
     vo = [v_prms' o_prms'];
-    xy_sel = {x_sel, y_sel}; 
+    {
     
-    if ~isempty(vo) && ~all(all(vo == 0)) && ~any(strcmp('light', xy_sel)) && ~any(strcmp('vis_stim', xy_sel))
+    if ~isempty(vo) && ~all(all(vo == 0)) && ~strcmp('',
         multiplot = 1; 
     else
         multiplot = 0; 
